@@ -1,0 +1,127 @@
+efine _CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
+#include <windows.h>
+#include <stdlib.h>
+#include <time.h>
+
+
+void get_time(long long* time_microseconds) {
+    LARGE_INTEGER frequency;
+    LARGE_INTEGER counter;
+    QueryPerformanceFrequency(&frequency);
+    QueryPerformanceCounter(&counter);
+    *time_microseconds = (long long)((double)counter.QuadPart * 1000000.0 / frequency.QuadPart);
+}
+
+
+void gen_sort_arr(int mas[], int size, int start_value) {
+    mas[0] = start_value;
+
+    for (int i = 1; i < size; i++) {
+        int step = rand() % 10 + 1;  
+        mas[i] = mas[i - 1] + step;
+    }
+}
+
+void check(int k, int mas[], int c)
+{
+    long long start, end;
+    get_time(&start);
+
+    for (int i = 0; i < c; i++) {
+        if (k == mas[i]) {
+            get_time(&end);
+            printf("%.9f true\n", (end - start) / 1000000.0);
+            return;
+        }
+    }
+
+    get_time(&end);
+    printf("%.9f false\n", (end - start) / 1000000.0);
+}
+
+void mx2(int mas[], int c)
+{
+    long long start, end;
+    get_time(&start);
+
+    int max1 = mas[0];
+    int max2 = mas[0];
+
+    for (int i = 1; i < c; i++) {
+        if (mas[i] > max1) {
+            max2 = max1;
+            max1 = mas[i];
+        }
+        else if (mas[i] > max2 && mas[i] != max1) {
+            max2 = mas[i];
+        }
+    }
+
+    get_time(&end);
+    printf("%.9f %d\n", (end - start) / 1000000.0, max2);
+}
+
+void bn(int k, int mas[], int c)
+{
+    long long start, end;
+    get_time(&start);
+
+    int left = 0;
+    int right = c - 1;
+
+    while (left <= right) {
+        int mid = left + (right - left) / 2;
+
+        if (mas[mid] == k) {
+            get_time(&end);
+            printf("%.9f %d\n", (end - start) / 1000000.0, mid);
+            return;
+        }
+        else if (mas[mid] < k) {
+            left = mid + 1;
+        }
+        else {
+            right = mid - 1;
+        }
+    }
+
+    get_time(&end);
+    printf("%.9f -1\n", (end - start) / 1000000.0);
+}
+
+void mptab(int n)
+{
+    long long start, end;
+    get_time(&start);
+
+    for (int i = 1; i <= n; i++) {
+        for (int j = 1; j <= n; j++) {
+            printf("%4d", i * j);
+        }
+        printf("\n");
+    }
+
+    get_time(&end);
+    printf("%.9f\n", (end - start) / 1000000.0);
+}
+
+int main() {
+    int arr[10000];
+    int size = 10000;
+
+    srand(time(NULL));
+
+    int start_value = rand() % 50 + 1;
+
+    gen_sort_arr(arr, size, start_value);
+
+    int el = arr[rand() % size];
+
+    check(el, arr, size);
+    mx2(arr, size);
+    bn(el, arr, size);
+    mptab(10);
+
+    return 0;
+}
